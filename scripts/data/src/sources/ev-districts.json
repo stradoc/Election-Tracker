@@ -1,0 +1,137 @@
+{
+  "_about": "Presidential results by congressional district for Maine and Nebraska, the two states that award electoral votes by district. Loaded by ev-districts.ts. Dem/Rep figures are from each state's Certificate of Ascertainment (National Archives). 'other' is every remaining candidate (third parties and write-ins) from the state canvass. Checks: district Dem/Rep sums equal the statewide certified totals (Maine 2016 differs by 184 overseas ballots that were never assigned to a district, as the certificate footnotes).",
+  "years": {
+    "2016": {
+      "sources": [
+        "https://www.archives.gov/files/electoral-college/2016/ascertainment-maine.pdf",
+        "https://sos.nebraska.gov/sites/default/files/doc/elections/2016/2016-canvass-book.pdf"
+      ],
+      "notes": "Maine 'other' = Johnson + Stein + Castle + McMullin from the certificate. Nebraska figures, including 'other' (Johnson + Stein + write-ins), from the Revised Official Report of the Board of State Canvassers.",
+      "districts": [
+        {
+          "state": "ME",
+          "district": 1,
+          "dem": 212774,
+          "rep": 154384,
+          "other": 27165
+        },
+        {
+          "state": "ME",
+          "district": 2,
+          "dem": 144817,
+          "rep": 181177,
+          "other": 27405
+        },
+        {
+          "state": "NE",
+          "district": 1,
+          "dem": 100132,
+          "rep": 158642,
+          "other": 23588
+        },
+        {
+          "state": "NE",
+          "district": 2,
+          "dem": 131030,
+          "rep": 137564,
+          "other": 23086
+        },
+        {
+          "state": "NE",
+          "district": 3,
+          "dem": 53332,
+          "rep": 199755,
+          "other": 17173
+        }
+      ]
+    },
+    "2020": {
+      "sources": [
+        "https://www.archives.gov/files/electoral-college/2020/ascertainment-maine.pdf",
+        "https://www.archives.gov/files/electoral-college/2020/ascertainment-nebraska.pdf"
+      ],
+      "notes": "'other' from the Maine Secretary of State 'U.S. President by Congressional District' tabulation and the Official Report of the Nebraska Board of State Canvassers.",
+      "districts": [
+        {
+          "state": "ME",
+          "district": 1,
+          "dem": 266376,
+          "rep": 164045,
+          "other": 12691
+        },
+        {
+          "state": "ME",
+          "district": 2,
+          "dem": 168696,
+          "rep": 196692,
+          "other": 10961
+        },
+        {
+          "state": "NE",
+          "district": 1,
+          "dem": 132261,
+          "rep": 180290,
+          "other": 9335
+        },
+        {
+          "state": "NE",
+          "district": 2,
+          "dem": 176468,
+          "rep": 154377,
+          "other": 8821
+        },
+        {
+          "state": "NE",
+          "district": 3,
+          "dem": 65854,
+          "rep": 222179,
+          "other": 6798
+        }
+      ]
+    },
+    "2024": {
+      "sources": [
+        "https://www.archives.gov/files/electoral-college/2024/ascertainment-maine.pdf",
+        "https://www.archives.gov/files/electoral-college/2024/ascertainment-nebraska.pdf"
+      ],
+      "notes": "'other' from the Maine Secretary of State 'U.S. President by Congressional District' tabulation and the Official Report of the Nebraska Board of State Canvassers.",
+      "districts": [
+        {
+          "state": "ME",
+          "district": 1,
+          "dem": 258863,
+          "rep": 165214,
+          "other": 9632
+        },
+        {
+          "state": "ME",
+          "district": 2,
+          "dem": 176789,
+          "rep": 212763,
+          "other": 8114
+        },
+        {
+          "state": "NE",
+          "district": 1,
+          "dem": 136153,
+          "rep": 177666,
+          "other": 6375
+        },
+        {
+          "state": "NE",
+          "district": 2,
+          "dem": 163541,
+          "rep": 148905,
+          "other": 6200
+        },
+        {
+          "state": "NE",
+          "district": 3,
+          "dem": 70301,
+          "rep": 238245,
+          "other": 4796
+        }
+      ]
+    }
+  }
+}

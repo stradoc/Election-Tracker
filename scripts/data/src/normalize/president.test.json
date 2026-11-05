@@ -1,0 +1,194 @@
+{
+  "_about": "Synthetic MEDSL county rows for president.test.ts. Numbers are made up; each block exercises one rule in normalizeCounties.",
+  "election": {
+    "year": 2020,
+    "office": "president",
+    "candidates": {
+      "dem": "Joe Biden",
+      "rep": "Donald Trump"
+    },
+    "sources": []
+  },
+  "rows": [
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "PA",
+      "county_name": "ADAMS",
+      "county_fips": "42001",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "18207",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "PA",
+      "county_name": "ADAMS",
+      "county_fips": "42001",
+      "candidate": "DONALD J TRUMP",
+      "candidatevotes": "37523",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "PA",
+      "county_name": "ADAMS",
+      "county_fips": "42001",
+      "candidate": "JO JORGENSEN",
+      "candidatevotes": "701",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "PA",
+      "county_name": "ADAMS",
+      "county_fips": "42001",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "9000",
+      "mode": "ELECTION DAY"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "PA",
+      "county_name": "ADAMS",
+      "county_fips": "42001",
+      "candidate": "DONALD J TRUMP",
+      "candidatevotes": "30000",
+      "mode": "ELECTION DAY"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "PA",
+      "county_name": "ALLEGHENY",
+      "county_fips": "42003",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "300000",
+      "mode": "ELECTION DAY"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "PA",
+      "county_name": "ALLEGHENY",
+      "county_fips": "42003",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "129065",
+      "mode": "ABSENTEE"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "PA",
+      "county_name": "ALLEGHENY",
+      "county_fips": "42003",
+      "candidate": "DONALD J TRUMP",
+      "candidatevotes": "250000",
+      "mode": "ELECTION DAY"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "PA",
+      "county_name": "ALLEGHENY",
+      "county_fips": "42003",
+      "candidate": "DONALD J TRUMP",
+      "candidatevotes": "32913",
+      "mode": "ABSENTEE"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "SD",
+      "county_name": "OGLALA LAKOTA",
+      "county_fips": "46113",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "2829",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "SD",
+      "county_name": "OGLALA LAKOTA",
+      "county_fips": "46113",
+      "candidate": "DONALD J TRUMP",
+      "candidatevotes": "255",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "AK",
+      "county_name": "DISTRICT 1",
+      "county_fips": "2001",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "3000",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "AK",
+      "county_name": "DISTRICT 1",
+      "county_fips": "2001",
+      "candidate": "DONALD J TRUMP",
+      "candidatevotes": "4000",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "ME",
+      "county_name": "FEDERAL PRECINCT",
+      "county_fips": "NA",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "50",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2016",
+      "office": "US PRESIDENT",
+      "state_po": "PA",
+      "county_name": "ADAMS",
+      "county_fips": "42001",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "1",
+      "mode": "TOTAL"
+    }
+  ],
+  "expected": {
+    "states": [
+      "42",
+      "46"
+    ],
+    "counties": {
+      "42001": {
+        "name": "Adams",
+        "dem": 18207,
+        "rep": 37523,
+        "other": 701,
+        "total": 56431
+      },
+      "42003": {
+        "name": "Allegheny",
+        "dem": 429065,
+        "rep": 282913,
+        "other": 0,
+        "total": 711978
+      },
+      "46102": {
+        "name": "Oglala Lakota",
+        "dem": 2829,
+        "rep": 255,
+        "other": 0,
+        "total": 3084
+      }
+    },
+    "noFips": 1
+  }
+}

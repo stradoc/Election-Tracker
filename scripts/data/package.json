@@ -1,0 +1,16 @@
+{
+  "name": "@tippingpoint/data",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Data pipeline: download sources, normalize, join, emit JSON for the server.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "pipeline": "node src/run.ts"
+  },
+  "dependencies": {
+    "@tippingpoint/shared": "*",
+    "csv-parse": "^7.0.3",
+    "us-atlas": "^3.0.1"
+  }
+}

@@ -1,0 +1,48 @@
+/* SegmentedControl.module.css: translucent pill track with one solid active pill. */
+
+.track {
+  display: inline-flex;
+  gap: 2px;
+  max-width: 100%;
+  padding: 3px;
+  background: var(--track);
+  border-radius: var(--radius-pill);
+  /* On narrow screens the pills scroll sideways instead of wrapping mid-label. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.option {
+  position: relative;
+  flex: none;
+  white-space: nowrap;
+  padding: 6px 14px 7px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--ink-muted);
+  cursor: pointer;
+  transition:
+    color var(--dur-press) var(--ease-press),
+    background-color var(--dur-press) var(--ease-press),
+    transform var(--dur-press) var(--ease-press);
+}
+
+.option:hover {
+  color: var(--ink);
+}
+
+.option:active {
+  transform: scale(0.96);
+}
+
+.option[data-active='true'] {
+  background: var(--ink);
+  color: var(--canvas);
+}
+
+/* The radio is visually hidden, so show keyboard focus on its pill. */
+.option:has(input:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}

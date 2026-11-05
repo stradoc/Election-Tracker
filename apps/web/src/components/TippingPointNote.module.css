@@ -1,0 +1,18 @@
+/* TippingPointNote.module.css: the signature sentence. Display face, generous size. */
+
+.note {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 400;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  max-width: 34ch;
+}
+
+.state {
+  font-weight: 700;
+  /* Matches the map's outline on the same state. */
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}

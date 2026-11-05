@@ -1,0 +1,139 @@
+/*
+ * tokens.css: every colour, type size, spacing, radius and motion value in the app.
+ *
+ * Components use only these custom properties, never raw values, so a theme is one block
+ * below. Light is a warm paper canvas; dark is true black with translucent rules.
+ *
+ * The partisan map scale (--map-*) was checked with the dataviz palette validator:
+ * - each party has five steps (1–2, 2–5, 5–10, 10–20, 20+ points) in a single hue, getting
+ *   darker (light theme) or brighter (dark theme), with visible gaps between steps and the
+ *   faintest step at least 2:1 against the canvas;
+ * - the 1–2 point steps are saturated enough to read as a win, and the toss-up neutral
+ *   (under 1 point) is lighter (light theme) or darker (dark theme) than them, so it clears
+ *   the ΔE 15 normal-vision and ΔE 8 colour-blind separation floors against both parties;
+ * - the Dem/Rep solids stay distinguishable under colour-vision deficiency (ΔE ≥ 16).
+ */
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --canvas: #f2eee4;
+  --surface: #faf8f3;
+  --surface-raised: #ffffff;
+  --ink: #17181b;
+  --ink-muted: #5f5b52;
+  --rule: #dcd5c7;
+  --rule-strong: rgba(23, 24, 27, 0.2);
+  --frost: rgba(242, 238, 228, 0.84);
+  --track: rgba(23, 24, 27, 0.07);
+  --shadow-card: 0 18px 40px -22px rgba(23, 24, 27, 0.4), 0 2px 6px rgba(23, 24, 27, 0.06);
+
+  /* Party solids: EV bar, legend chips, nominee markers. */
+  --dem: #3b66a7;
+  --rep: #ae4238;
+
+  /* Map margin scale: toss-up, then 5 steps per party from narrow to wide. */
+  --map-tossup: #dcd6ca;
+  --map-d1: #83a9e4;
+  --map-d2: #608dd2;
+  --map-d3: #4271ba;
+  --map-d4: #29569c;
+  --map-d5: #143d7b;
+  --map-r1: #e28d84;
+  --map-r2: #d4665c;
+  --map-r3: #bb443d;
+  --map-r4: #9a2925;
+  --map-r5: #761615;
+  --map-border: var(--canvas);
+  --map-county-border: rgba(242, 238, 228, 0.6);
+  --map-dimmed-opacity: 0.25;
+  --map-tipping-outline: var(--ink);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --canvas: #000000;
+  --surface: #141416;
+  --surface-raised: #1c1c1f;
+  --ink: #ece9e2;
+  --ink-muted: #a19d93;
+  --rule: rgba(255, 255, 255, 0.1);
+  --rule-strong: rgba(255, 255, 255, 0.24);
+  --frost: rgba(0, 0, 0, 0.72);
+  --track: rgba(255, 255, 255, 0.08);
+  --shadow-card: 0 18px 44px -20px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.08);
+
+  --dem: #6e95d6;
+  --rep: #d66a5e;
+
+  --map-tossup: #2a2924;
+  --map-d1: #2b569a;
+  --map-d2: #4070bc;
+  --map-d3: #5a8cda;
+  --map-d4: #79a9f3;
+  --map-d5: #9dc6ff;
+  --map-r1: #93332d;
+  --map-r2: #b9463f;
+  --map-r3: #dc5e55;
+  --map-r4: #f38277;
+  --map-r5: #ffa89d;
+  --map-border: #000000;
+  --map-county-border: rgba(0, 0, 0, 0.55);
+  --map-dimmed-opacity: 0.22;
+  --map-tipping-outline: var(--ink);
+}
+
+:root {
+  /* Type: Sora for display (wordmark, big numbers, headings), Poppins for reading. */
+  --font-display: 'Sora', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale (≈ 1.25 ratio). */
+  --text-xs: 0.8125rem;
+  --text-sm: 0.9375rem;
+  --text-md: 1.0625rem;
+  --text-lg: 1.3125rem;
+  --text-xl: 1.75rem;
+  --text-2xl: 2.5rem;
+  --text-3xl: 3.5rem;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 72px;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-pill: 999px;
+
+  --content-max: 1240px;
+  --gutter: clamp(16px, 4vw, 40px);
+
+  /*
+   * Motion. "Settle" is for anything that measures (EV bar, swing, zoom): fast out, slow
+   * arrival, no overshoot. "Press" is instant feedback to a tap.
+   */
+  --ease-settle: cubic-bezier(0.16, 0.84, 0.28, 1);
+  --ease-press: cubic-bezier(0.2, 0, 0, 1);
+  --dur-press: 130ms;
+  --dur-base: 220ms;
+  --dur-measure: 700ms;
+  /* Read by src/map/useMapZoom.ts so reduced motion also stops the map zoom. */
+  --dur-zoom: 750ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-press: 0ms;
+    --dur-base: 0ms;
+    --dur-measure: 0ms;
+    --dur-zoom: 0ms;
+  }
+}

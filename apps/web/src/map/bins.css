@@ -1,0 +1,41 @@
+/*
+ * bins.css: turns a data-bin attribute into a colour, for SVG paths and HTML swatches alike.
+ *
+ * Any element with data-bin="d3" gets --bin-fill set to the matching map token. SVG
+ * paths use it as `fill`, HTML tiles and legend swatches as `background`, so every place
+ * that shows a margin colour uses the same lookup.
+ */
+
+[data-bin='tossup'] {
+  --bin-fill: var(--map-tossup);
+}
+[data-bin='d1'] {
+  --bin-fill: var(--map-d1);
+}
+[data-bin='d2'] {
+  --bin-fill: var(--map-d2);
+}
+[data-bin='d3'] {
+  --bin-fill: var(--map-d3);
+}
+[data-bin='d4'] {
+  --bin-fill: var(--map-d4);
+}
+[data-bin='d5'] {
+  --bin-fill: var(--map-d5);
+}
+[data-bin='r1'] {
+  --bin-fill: var(--map-r1);
+}
+[data-bin='r2'] {
+  --bin-fill: var(--map-r2);
+}
+[data-bin='r3'] {
+  --bin-fill: var(--map-r3);
+}
+[data-bin='r4'] {
+  --bin-fill: var(--map-r4);
+}
+[data-bin='r5'] {
+  --bin-fill: var(--map-r5);
+}

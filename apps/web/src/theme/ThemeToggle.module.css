@@ -1,0 +1,38 @@
+/* ThemeToggle.module.css: a pill with a half-filled disc that shows the current theme. */
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 12px 7px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--track);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: transform var(--dur-press) var(--ease-press);
+}
+
+.toggle:active {
+  transform: scale(0.96);
+}
+
+.icon {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ink);
+  background: linear-gradient(90deg, var(--ink) 50%, transparent 50%);
+  transition: transform var(--dur-base) var(--ease-settle);
+}
+
+.icon[data-theme-icon='dark'] {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 480px) {
+  .text {
+    display: none;
+  }
+}

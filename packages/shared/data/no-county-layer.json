@@ -1,0 +1,6 @@
+{
+  "_about": "States with no county-level results, and why. Loaded by src/fips.ts. The pipeline skips their county rows; the web app shows the reason when the state is opened.",
+  "states": {
+    "02": "Alaska reports presidential results by state house district, not by borough, so there is no county map for Alaska."
+  }
+}

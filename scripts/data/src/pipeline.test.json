@@ -1,0 +1,66 @@
+{
+  "_about": "Known results the processed data must reproduce. Pledged electoral votes (2016 certified totals differ because of faithless electors: 304-227). Tipping points by state FIPS: 55 = Wisconsin, 42 = Pennsylvania.",
+  "elections": [
+    {
+      "year": 2016,
+      "dem": 232,
+      "rep": 306,
+      "tippingPoint": "55"
+    },
+    {
+      "year": 2020,
+      "dem": 306,
+      "rep": 232,
+      "tippingPoint": "55"
+    },
+    {
+      "year": 2024,
+      "dem": 226,
+      "rep": 312,
+      "tippingPoint": "42"
+    }
+  ],
+  "placesPerElection": 56,
+  "sideOf": [
+    {
+      "candidate": "TRUMP, DONALD J.",
+      "nominees": {
+        "dem": "Joe Biden",
+        "rep": "Donald Trump"
+      },
+      "side": "rep"
+    },
+    {
+      "candidate": "DONALD J TRUMP",
+      "nominees": {
+        "dem": "Joe Biden",
+        "rep": "Donald Trump"
+      },
+      "side": "rep"
+    },
+    {
+      "candidate": "JOSEPH R BIDEN JR",
+      "nominees": {
+        "dem": "Joe Biden",
+        "rep": "Donald Trump"
+      },
+      "side": "dem"
+    },
+    {
+      "candidate": "HARRIS, KAMALA D.",
+      "nominees": {
+        "dem": "Kamala Harris",
+        "rep": "Donald Trump"
+      },
+      "side": "dem"
+    },
+    {
+      "candidate": "JORGENSEN, JO",
+      "nominees": {
+        "dem": "Joe Biden",
+        "rep": "Donald Trump"
+      },
+      "side": "other"
+    }
+  ]
+}
