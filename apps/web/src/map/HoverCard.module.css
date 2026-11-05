@@ -5,7 +5,7 @@
   top: var(--space-3);
   left: var(--space-3);
   z-index: 3;
-  width: 260px;
+  width: 280px;
   padding: var(--space-3) var(--space-4);
   background: var(--surface-raised);
   border-radius: var(--radius-md);
@@ -85,4 +85,44 @@
   margin-top: var(--space-1);
   color: var(--ink-muted);
   font-size: var(--text-xs);
+}
+
+/* The place's demographic profile: quieter than the result above it. */
+.profile {
+  display: grid;
+  gap: 3px;
+  margin: var(--space-2) 0 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--rule);
+  font-size: var(--text-xs);
+}
+
+.profileRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.profileRow dt {
+  color: var(--ink-muted);
+}
+
+.profileRow dd {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.profileRow[data-stacked='true'] {
+  flex-direction: column;
+  gap: 0;
+}
+
+.profileRow[data-stacked='true'] dd {
+  white-space: normal;
+}
+
+.source {
+  margin-top: 2px;
+  color: var(--ink-muted);
+  font-size: 0.6875rem;
 }

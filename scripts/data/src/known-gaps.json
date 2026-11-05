@@ -1,0 +1,9 @@
+{
+  "_about": "Coverage findings that are explained and expected. join.ts lists these under 'explained' in coverage.json instead of counting them as problems. Add an entry only with a reason a reader can check.",
+  "geometryWithoutResults": {
+    "15005": "Kalawao County, HI (about 80 residents) has no election administration of its own; its votes are counted in Maui County (15009)."
+  },
+  "stateSumMismatches": {
+    "23": "Maine reports overseas (UOCAVA) ballots statewide only, so its counties sum about 1% below the statewide total."
+  }
+}

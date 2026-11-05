@@ -9,7 +9,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent } from 'react';
-import { marginOf, type Nominees, type PlaceResult } from '@tippingpoint/shared';
+import { marginOf, type GeoProfile, type Nominees, type PlaceResult } from '@tippingpoint/shared';
 import { leadLabel } from '../format.ts';
 import { MAP_HEIGHT, MAP_WIDTH, useGeometry, type MapShape } from './geometry.ts';
 import { HoverCard, type CardPosition } from './HoverCard.tsx';
@@ -26,9 +26,17 @@ interface UsMapProps {
   /** geoId of the tipping-point place, outlined in the national view. */
   readonly tippingPointId?: string;
   readonly nominees: Nominees;
+  /** State FIPS codes that have county results, so the hover hint only offers real ones. */
+  readonly countyStates: readonly string[];
+  /** Demographic profiles by geoId (states and the open state's counties), when loaded. */
+  readonly profiles?: ReadonlyMap<string, GeoProfile>;
   /** Called with a state's FIPS when clicked, or undefined to return to the national view. */
   readonly onSelectState: (stateFips: string | undefined) => void;
 }
+
+/** Hover-card hint for a state in the national view, depending on whether it has counties. */
+const HINT_WITH_COUNTIES = 'Select to see counties';
+const HINT_WITHOUT_COUNTIES = 'Select to zoom in';
 
 /** What the hover card is showing, and where (no position = keyboard focus). */
 interface HoverState {
@@ -47,6 +55,8 @@ export function UsMap({
   selectedStateFips,
   tippingPointId,
   nominees,
+  countyStates,
+  profiles,
   onSelectState,
 }: UsMapProps) {
   const geometry = useGeometry();
@@ -78,6 +88,8 @@ export function UsMap({
   }
 
   const isZoomed = selectedStateFips !== undefined;
+  const stateHint = (stateFips: string): string =>
+    countyStates.includes(stateFips) ? HINT_WITH_COUNTIES : HINT_WITHOUT_COUNTIES;
   const countyShapes =
     isZoomed && countyResults.size > 0
       ? (geometry.data.countiesByState.get(selectedStateFips) ?? [])
@@ -172,9 +184,10 @@ export function UsMap({
       {hover !== undefined && (
         <HoverCard
           place={hover.place}
+          profile={profiles?.get(hover.id)}
           nominees={nominees}
           position={hover.position}
-          hint={hover.place.level === 'state' && !isZoomed ? 'Select to see counties' : undefined}
+          hint={hover.place.level === 'state' && !isZoomed ? stateHint(hover.id) : undefined}
         />
       )}
     </div>

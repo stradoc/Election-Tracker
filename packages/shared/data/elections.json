@@ -1,20 +1,23 @@
 {
-  "_about": "Elections TippingPoint covers. Loaded and documented by src/registry.ts. Add a row to add a year; the pipeline checks nominee surnames against the source data.",
+  "_about": "Elections TippingPoint covers. Loaded and documented by src/registry.ts. Add a row to add a year; the pipeline checks nominee surnames against the source data. acsVintage is the final year of the ACS 5-year survey used for demographics (normally the election year).",
   "president": [
     {
       "year": 2024,
       "dem": "Kamala Harris",
-      "rep": "Donald Trump"
+      "rep": "Donald Trump",
+      "acsVintage": 2024
     },
     {
       "year": 2020,
       "dem": "Joe Biden",
-      "rep": "Donald Trump"
+      "rep": "Donald Trump",
+      "acsVintage": 2020
     },
     {
       "year": 2016,
       "dem": "Hillary Clinton",
-      "rep": "Donald Trump"
+      "rep": "Donald Trump",
+      "acsVintage": 2016
     }
   ]
 }

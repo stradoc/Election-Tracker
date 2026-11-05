@@ -160,5 +160,46 @@
         "rep": 11
       }
     ]
+  },
+  "datasetPath": [
+    {
+      "key": {
+        "year": 2024,
+        "office": "president",
+        "dataset": "results"
+      },
+      "path": "2024/president/results.json"
+    },
+    {
+      "key": {
+        "year": 2024,
+        "office": "president",
+        "dataset": "results",
+        "stateFips": "42"
+      },
+      "path": "2024/president/results/42.json"
+    },
+    {
+      "key": {
+        "year": 2024,
+        "office": "president",
+        "dataset": "profiles"
+      },
+      "path": "2024/profiles.json"
+    },
+    {
+      "key": {
+        "year": 2020,
+        "office": "president",
+        "dataset": "profiles",
+        "stateFips": "09"
+      },
+      "path": "2020/profiles/09.json"
+    }
+  ],
+  "turnout": {
+    "votes": 640,
+    "cvap": 1000,
+    "rate": 0.64
   }
 }

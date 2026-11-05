@@ -17,10 +17,20 @@ import {
 const PERCENT = 100;
 
 const voteFormat = new Intl.NumberFormat('en-US');
+const dollarFormat = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  maximumFractionDigits: 0,
+});
 
 /** 3543308 → "3,543,308". Swing can produce fractional votes, so round for display. */
 export function formatVotes(votes: number): string {
   return voteFormat.format(Math.round(votes));
+}
+
+/** 78548 → "$78,548". */
+export function formatDollars(amount: number): string {
+  return dollarFormat.format(amount);
 }
 
 /** "Kamala Harris" → "Harris". */

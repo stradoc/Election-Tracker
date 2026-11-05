@@ -5,6 +5,212 @@ Newest first. Each entry lists what changed, the files touched, and what to pick
 
 ---
 
+## 2026-11-05: Phase 2 starts — ACS demographic profiles for every state and county
+
+Branch: `phase-1-foundation`. Not committed yet.
+
+### Changed
+
+**New data source: Census ACS 5-year estimates.**
+
+- The key lives in `scripts/data/.env` (gitignored; `.env.example` added). It's appended to
+  requests last and kept out of every log and error message.
+- Raw API responses are cached in `data/raw/census-acs5/<year>-<geography>.json`, so later
+  runs work offline.
+- What's fetched is listed once in `scripts/data/src/sources/acs.json`:
+  - population
+  - citizens 18+ (from B05003, because B29001 doesn't exist in 2016)
+  - race and ethnicity
+  - bachelor's degree or higher
+  - median household income
+  - median age
+
+  Every variable's label was checked to mean the same thing in the 2016 and 2024 surveys.
+
+**Each election gets the survey ending in its own year:** 2012–2016, 2016–2020 and 2020–2024.
+Connecticut's 2024 counties come from the 2017–2021 survey, because later surveys report
+planning regions. That's documented as a vintage override.
+
+**New shared types and helpers.**
+
+- `GeoProfile`, and a generic `Dataset<Place>` that `ResultsDataset` now extends.
+- `DATASET_INFO` (`perOffice`), which replaces the bare `DATASETS` list.
+- `datasetPath()`, now the single definition of the `data/processed` layout. Both the
+  pipeline and the server use it. Profiles live at `<year>/profiles[/<fips>].json` and are
+  shared by every office.
+- `turnoutRate()` = votes ÷ citizens 18+.
+
+**Pipeline.**
+
+- `normalize/acs.ts`.
+- `join.ts` reports results with no profile.
+- `emit.ts` writes every dataset through one `emitDataset`.
+- The manifest lists each election's `datasets`.
+- `ManualDownloadRequired` is renamed `OwnerActionRequired`. It now covers both the
+  guestbook download and a missing API key, through one `optional()` helper in `run.ts`.
+
+**Server.**
+
+- `ResultsProvider` is renamed `DataProvider`; it serves any dataset.
+- `StaticProvider` now re-reads a file when it changes on disk and never caches a missing
+  file. Before, a server started before `npm run data` kept serving the old manifest.
+- `/api/elections` includes `datasets`.
+
+**Web.**
+
+- A generic `useDataset` hook; `useProfiles`.
+- The hover card has a quiet "about this place" section:
+  - turnout of citizens 18+
+  - bachelor's degree or higher
+  - race and ethnicity, largest group first
+  - median income
+  - the survey period
+
+**Docs.** In `AGENTS.md`, the Later phases list was collapsed into one line by Prettier;
+restored.
+
+### Verified
+
+- `npm run data`: every state and county result has a profile, in all three years (3,113
+  county profiles against 3,112 results; the extra is Kalawao, HI).
+- Spot checks against known facts:
+  - Fairfax County, VA: 65% with a bachelor's degree
+  - Holmes County, MS: 81% Black
+  - Starr County, TX: 97% Hispanic
+  - Fairfield County, CT 2024: from the 2017–2021 survey
+  - De Baca County, NM: median income suppressed by the Census, so null, not 0
+- National turnout (votes ÷ citizens 18+): 60.9% / 67.9% / 64.5% for 2016 / 2020 / 2024,
+  close to official turnout estimates.
+- 73 unit tests pass: new ACS normalizer, dataset path, turnout, profile data and API tests.
+  Typecheck, lint, Prettier and the build are clean.
+- `npm run e2e` (now 11 checks, including "County card shows demographics") passes for 2024
+  PA, 2024 CT and 2016 WI.
+
+### Files
+
+- **Added:**
+  - `packages/shared/src/turnout.ts`
+  - `scripts/data/.env.example` (and a gitignored `scripts/data/.env`)
+  - `scripts/data/src/sources/acs.ts`, `acs.json`
+  - `scripts/data/src/normalize/acs.ts`, `acs.test.ts`, `acs.test.json`
+  - `apps/server/src/providers/DataProvider.ts`
+- **Removed:** `apps/server/src/providers/ResultsProvider.ts` (replaced by `DataProvider.ts`)
+- **Changed: shared**
+  - `src/schema.ts`, `src/registry.ts`, `src/sources.ts`, `src/index.ts`
+  - `data/elections.json` (`acsVintage`)
+  - `src/shared.test.ts`, `.json`
+- **Changed: pipeline**
+  - `src/run.ts`, `paths.ts`, `join.ts`, `emit.ts`
+  - `src/sources/dataverse.ts`
+  - `src/pipeline.test.ts`, `.json`
+  - `src/normalize/president.test.json`
+- **Changed: server**
+  - `src/app.ts`, `routes/dataset.ts`, `providers/StaticProvider.ts`
+  - `src/app.test.ts`, `.json`
+- **Changed: web**
+  - `src/data/api.ts`, `src/format.ts`
+  - `src/map/HoverCard.tsx`, `.module.css`, `src/map/UsMap.tsx`
+  - `src/pages/ElectionPage.tsx`
+  - `e2e/map-check.ts`
+- **Changed: docs:** `AGENTS.md`, `README.md`, `CHANGELOG.md`
+
+### Next steps / open issues
+
+1. **Demographics scatter** (places evidence): each county's result or swing plotted against
+   a demographic (e.g. % bachelor's), with the ecological-fallacy note. This is the first
+   module in the web analysis registry (`apps/web/src/analysis/registry.ts`, not created yet).
+2. **Swing module:** county shift arrows 2016→2020→2024, and a state swing ranking.
+3. **Population density** for "swing by county type" needs county land area. It isn't in the
+   ACS API; the Census Gazetteer file is the likely source.
+
+---
+
+## 2026-11-05: County layer tested on real data; browser check; two fixes
+
+Branch: `phase-1-foundation`. Not committed yet.
+
+### Changed
+
+**County data is live.** The owner downloaded MEDSL's county file (it was saved in the state
+folder at first and moved to `data/raw/medsl-president-county/`). The pipeline joins 3,112
+counties per year with no unexplained findings.
+
+**Kansas City, MO fix.** MEDSL's 2024 file codes Kansas City as `36000`, a code that starts
+with New York's state number.
+
+- About 96k Harris votes landed in New York (+2% Dem) and went missing from Missouri (−8%).
+- Remaps are now keyed `"<postal>:<code>"`, and `MO:36000` merges into Jackson County,
+  alongside the existing `MO:2938000` for 2016/2020.
+- A new guard drops and reports any row whose county code belongs to another state
+  (`rowsInWrongState`).
+- A county keeps the name of its own (non-remapped) rows, so Jackson County is never labelled
+  "Kansas City".
+
+**Known gaps are documented** in `scripts/data/src/known-gaps.json`. They're listed under
+`explained` in `coverage.json`:
+
+- Kalawao, HI: its votes are counted in Maui.
+- Maine: overseas ballots are statewide-only, so counties sum about 1% low.
+
+**Swing slider bug.** The slider was bound straight to the URL, which the router updates
+asynchronously, so rapid key presses (and fast drags) snapped back and only one step
+registered. The slider now keeps its own value and writes it to the URL. The URL is still the
+source of truth for links and the back button.
+
+**Hover hint.** States without county results now say "Select to zoom in" instead of
+"Select to see counties".
+
+**Browser check (`npm run e2e`).** puppeteer-core drives the system Chrome (profile in
+`.tmp/`). It checks:
+
+- the national map
+- the state and county hover cards
+- zoom in
+- counties on the map matching the county table
+- Escape, the Back button and browser back
+- swing
+- the theme toggle
+
+### Verified
+
+- `npm run e2e` passed for:
+  - 2024 PA: 67 counties, zoom scale 7.8, and a −3 swing gives 222–316
+  - 2024 MO: 115 counties, Jackson = 187,026 Harris (91,366 + 95,660 Kansas City)
+  - 2024 CT: 8 counties
+  - 2020 TX: 254 counties
+  - 2016 ME: 16 counties
+  - 2024 AK: county step skipped, with the page's Alaska explanation
+- 55 unit tests pass. Typecheck, lint, Prettier and the build are clean.
+
+### Files
+
+- **Added:**
+  - `scripts/data/src/known-gaps.json`
+  - `apps/web/e2e/map-check.ts`
+- **Changed: pipeline**
+  - `scripts/data/src/normalize/president.ts`, `county-fips-fixes.json`,
+    `president.test.ts`, `president.test.json`
+  - `scripts/data/src/join.ts`, `run.ts`
+- **Changed: web**
+  - `apps/web/src/pages/ElectionPage.tsx`, `apps/web/src/map/UsMap.tsx`
+  - `apps/web/tsconfig.json`, `apps/web/package.json` (puppeteer-core)
+- **Changed: root and docs**
+  - `package.json` (`e2e` script), `package-lock.json`
+  - `AGENTS.md`, `README.md`, `CHANGELOG.md` (this entry, and the stale "push blocked" note
+    below is marked resolved)
+
+### Next steps / open issues
+
+Phase 2 (AGENTS.md → Roadmap). The county data it depends on is now in place.
+
+1. **ACS demographics source + `GeoProfile` schema.** This needs a free Census API key from
+   the owner, in a gitignored `.env`.
+2. **Swing module.** County shift arrows for 2016→2020→2024, and a state swing ranking.
+3. **Turnout** (UF Election Lab + ACS CVAP), **polling error** (538 archive), then **"if only X
+   voted"** (CES + CPS).
+
+---
+
 ## 2026-11-05: Every state shows its winner's colour (no neutral "under 1" band)
 
 Branch: `phase-1-foundation`.
@@ -39,8 +245,8 @@ Branch: `phase-1-foundation`.
 
 - The open issue in the entry below ("races under 1 point still show the neutral colour") is
   resolved by this entry.
-- Pushing `phase-1-foundation` is still blocked: GitHub rejected the saved credentials on this
-  machine. The owner needs a personal access token or an SSH remote.
+- ~~Pushing `phase-1-foundation` is still blocked.~~ Resolved: the remote now uses SSH
+  (`git@github.com:stradoc/Election-Tracker.git`), and both commits are on GitHub.
 
 ---
 

@@ -6,17 +6,17 @@
  */
 
 import Fastify, { type FastifyInstance } from 'fastify';
-import type { ResultsProvider } from './providers/ResultsProvider.ts';
+import type { DataProvider } from './providers/DataProvider.ts';
 import { StaticProvider } from './providers/StaticProvider.ts';
 import { registerRoutes } from './routes/dataset.ts';
 
 /**
  * Create the API app.
- * @param provider where results come from (defaults to the static historical files)
+ * @param provider where data comes from (defaults to the static historical files)
  * @param logger whether Fastify logs requests (off in tests)
  */
 export function buildApp(
-  provider: ResultsProvider = new StaticProvider(),
+  provider: DataProvider = new StaticProvider(),
   logger = false,
 ): FastifyInstance {
   const app = Fastify({ logger });

@@ -1,13 +1,26 @@
 {
   "_about": "Expected API behaviour for app.test.ts.",
-  "status": { "ok": 200, "notFound": 404 },
+  "status": {
+    "ok": 200,
+    "notFound": 404
+  },
   "notFound": [
-    { "url": "/api/1999/president/results" },
-    { "url": "/api/2024/president/nonsense" },
-    { "url": "/api/2024/president/results/99" },
-    { "url": "/api/2024/president/results/6" }
+    {
+      "url": "/api/1999/president/results"
+    },
+    {
+      "url": "/api/2024/president/nonsense"
+    },
+    {
+      "url": "/api/2024/president/results/99"
+    },
+    {
+      "url": "/api/2024/president/results/6"
+    }
   ],
   "electionCount": 3,
   "nationalUrl": "/api/2024/president/results",
-  "nationalPlaces": 56
+  "nationalPlaces": 56,
+  "profilesUrl": "/api/2024/president/profiles/42",
+  "profilesPlaces": 67
 }

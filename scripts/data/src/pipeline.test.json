@@ -62,5 +62,24 @@
       },
       "side": "other"
     }
-  ]
+  ],
+  "profiles": {
+    "_about": "Real values from the ACS 2020–2024 5-year survey (checked against the Census API), and Connecticut's documented 2017–2021 fallback.",
+    "year": 2024,
+    "states": 51,
+    "counties": [
+      {
+        "geoId": "42003",
+        "stateFips": "42",
+        "population": 1238177,
+        "period": "2020–2024"
+      },
+      {
+        "geoId": "09001",
+        "stateFips": "09",
+        "population": 956446,
+        "period": "2017–2021"
+      }
+    ]
+  }
 }

@@ -1,0 +1,28 @@
+{
+  "_about": "What the pipeline asks the Census Data API for. Loaded by sources/acs.ts (fetch) and normalize/acs.ts (turn rows into GeoProfile). Each measure is the sum of the listed ACS 5-year variables; labels were checked to mean the same thing in the 2016 and 2024 surveys.",
+  "measures": {
+    "population": ["B01003_001E"],
+    "cvap": ["B05003_009E", "B05003_011E", "B05003_020E", "B05003_022E"],
+    "raceTotal": ["B03002_001E"],
+    "whiteNonHispanic": ["B03002_003E"],
+    "blackNonHispanic": ["B03002_004E"],
+    "asianNonHispanic": ["B03002_006E"],
+    "hispanic": ["B03002_012E"],
+    "adults25Plus": ["B15003_001E"],
+    "bachelorsOrHigher": ["B15003_022E", "B15003_023E", "B15003_024E", "B15003_025E"],
+    "medianHouseholdIncome": ["B19013_001E"],
+    "medianAge": ["B01002_001E"]
+  },
+  "measureNotes": {
+    "cvap": "Citizens 18+: native-born plus naturalized, men plus women (B05003). Table B29001 would be simpler but doesn't exist in the 2016 survey.",
+    "bachelorsOrHigher": "Bachelor's, master's, professional and doctorate degrees, out of adults 25+ (B15003).",
+    "medianHouseholdIncome": "In dollars of the survey's final year, so 2016 and 2024 values aren't directly comparable."
+  },
+  "vintageOverrides": {
+    "09": {
+      "fromVintage": 2022,
+      "useVintage": 2021,
+      "why": "From the 2022 survey on, Connecticut is reported by 9 planning regions instead of its 8 counties, and the map and election results still use the counties. The 2017–2021 survey is the last with county figures; medians like income can't be rebuilt by adding towns."
+    }
+  }
+}

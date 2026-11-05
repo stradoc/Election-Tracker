@@ -25,12 +25,18 @@ npm run dev          # API on :8787 + web on :5173 (Vite proxies /api)
 npm test             # Vitest, all workspaces
 npm run typecheck    # tsc for every workspace
 npm run lint         # ESLint
+npm run e2e          # clicks through the running site in headless Chrome (needs npm run dev)
 npm run format       # Prettier
 ```
 
-The MEDSL **county** file sits behind a Dataverse guestbook form, so it must be downloaded
-once by hand. `npm run data` prints the exact steps and where to save it. Until then the
-site shows states only, and opening a state says county results haven't been generated.
+Two sources need the owner once. `npm run data` prints what to do and builds everything else
+without them:
+
+- The MEDSL **county** file sits behind a Dataverse guestbook form. Download it by hand into
+  `data/raw/medsl-president-county/`. Without it the site shows states only.
+- The **Census API key** for ACS demographics goes in `scripts/data/.env` (gitignored; copy
+  `.env.example`). Without it there are no profiles. Downloaded ACS tables are kept in
+  `data/raw/census-acs5/`, so later runs don't call the API.
 
 ## Repo map
 
@@ -38,8 +44,8 @@ site shows states only, and opening a state says county results haven't been gen
 RULES.md  AGENTS.md  CLAUDE.md (imports both)  CHANGELOG.md  README.md
 packages/shared/          @tippingpoint/shared: used by every other workspace
   data/*.json             reference tables (EV apportionment, elections, no-county states)
-  src/schema.ts           PlaceResult, ResultsDataset, Manifest: the shapes every layer uses
-  src/registry.ts         ELECTIONS (from data/elections.json), DATASETS
+  src/schema.ts           PlaceResult, GeoProfile, Dataset<…>, Manifest: shapes every layer uses
+  src/registry.ts         ELECTIONS (data/elections.json), DATASET_INFO, datasetPath() (file layout)
   src/sources.ts          SOURCES: every upstream dataset, pinned version, license
   src/fips.ts             states by FIPS / postal; NO_COUNTY_LAYER
   src/ev-tables.ts        electoral votes per year (from data/apportionment.json)
@@ -47,17 +53,20 @@ packages/shared/          @tippingpoint/shared: used by every other workspace
   src/swing.ts            applyUniformSwing
   src/electoral.ts        electoralTotals, winnerOf, tippingPoint
   src/scenario.ts         computeScenario: the ONLY way views get adjusted numbers
+  src/turnout.ts          turnoutRate: votes ÷ citizens 18+ (results joined to profiles)
   src/dev-config.ts       DEFAULT_API_PORT (server + Vite proxy)
 scripts/data/             @tippingpoint/data: the pipeline (`npm run data`)
   src/run.ts              CLI; runs every stage for every registered election
   src/paths.ts            data/raw/<source>/ and data/processed/ locations
-  src/sources/            stage 1: fetch only (dataverse.ts; ev-districts.ts + .json curated)
-  src/normalize/          stage 2: raw → PlaceResult (president.ts; county-fips-fixes.json)
-  src/join.ts             stage 3: coverage checks (results ↔ map shapes ↔ state totals)
+  .env                    secrets (CENSUS_API_KEY); gitignored, see .env.example
+  src/sources/            stage 1: fetch only (dataverse.ts; acs.ts + acs.json; ev-districts.*)
+  src/normalize/          stage 2: raw → PlaceResult (president.ts) and GeoProfile (acs.ts)
+  src/join.ts             stage 3: coverage checks (results ↔ map shapes ↔ profiles ↔ totals)
+  src/known-gaps.json     expected coverage findings, each with a reason (not counted as problems)
   src/emit.ts             stage 5: write JSON + manifest.json + coverage.json
 apps/server/              @tippingpoint/server: Fastify API
   src/routes/dataset.ts   GET /api/elections, GET /api/:year/:office/:dataset[/:stateFips]
-  src/providers/          ResultsProvider interface; StaticProvider (data/processed)
+  src/providers/          DataProvider interface; StaticProvider (reads data/processed)
 apps/web/                 @tippingpoint/web: React 18 + Vite + plain CSS + D3
   src/pages/ElectionPage.tsx   wires URL → data → computeScenario → views
   src/map/                UsMap (one map for nation/state/county), useMapZoom, geometry,
@@ -66,6 +75,7 @@ apps/web/                 @tippingpoint/web: React 18 + Vite + plain CSS + D3
                           ResultsTable, SegmentedControl
   src/styles/tokens.css   every colour/type/motion value, light + dark
   src/data/api.ts         the only place the web app fetches
+  e2e/map-check.ts        browser check: hover, zoom, counties, back/Esc, swing, theme
 data/raw, data/processed  generated, gitignored (third-party data is never committed)
 ```
 
@@ -73,12 +83,14 @@ data/raw, data/processed  generated, gitignored (third-party data is never commi
 
 ```
 SOURCES (shared) ──► sources/ fetch ──► data/raw/<id>/
-                     normalize/      ──► PlaceResult[]  (one shape for every level)
+                     normalize/      ──► PlaceResult[] / GeoProfile[]  (same ids, every level)
                      join.ts         ──► coverage.json  (unmatched FIPS, sum mismatches)
                      [derive/]       ──► Phase 2: swing, turnout, group estimates, polls
-                     emit.ts         ──► data/processed/<year>/<office>/results[/<fips>].json
+                     emit.ts         ──► data/processed/<datasetPath()>
+                                           2024/president/results[/<fips>].json
+                                           2024/profiles[/<fips>].json   (same for every office)
 StaticProvider ──► Fastify /api ──► web useResults() ──► computeScenario(places, scenario)
-                                                       ──► UsMap, EvBar, tables, tiles
+                                    web useProfiles() ─┘──► UsMap, HoverCard, EvBar, tables
 ```
 
 Key conventions:
@@ -87,7 +99,7 @@ Key conventions:
   - State: 2-digit FIPS (`"42"`).
   - County: 5-digit FIPS (`"42003"`).
   - ME/NE district: `"23-2"`.
-  - Results, us-atlas shapes and (Phase 2) ACS demographics all join on these keys.
+  - Results, us-atlas shapes and ACS demographic profiles all join on these keys.
 - **Margin.** Margin = (dem − rep) / total votes, as a fraction. Positive = Democratic.
   The UI works in points; it converts once in ElectionPage.
 - **One scenario engine.** Swing (and later "only group X voted") are fields on `Scenario`,
@@ -116,6 +128,17 @@ Key conventions:
 
   That's why reference data lives in JSON and tests are table-driven.
 
+- **County codes.**
+  - Remaps in `normalize/county-fips-fixes.json` are keyed `"<postal>:<code>"` (e.g.
+    `"MO:36000"`), so a fix can never move votes into another state.
+  - Any row whose code doesn't belong to its own state is dropped and listed as
+    `rowsInWrongState` in `coverage.json`. Fix each one with a remap.
+  - Expected gaps go in `known-gaps.json` with a checkable reason. Today that's Kalawao, HI
+    (counted in Maui) and Maine (overseas ballots are reported statewide only).
+- **Browser check.** `npm run e2e` drives the system Chrome through puppeteer-core, with its
+  profile and caches kept in `.tmp/`. Options:
+  - `E2E_YEAR` and `E2E_STATE` pick the election and state.
+  - States without county results report "skip", with the page's explanation.
 - **Tests are table-driven.** `foo.test.ts` reads its cases from `foo.test.json`. Data-backed
   tests skip themselves until `npm run data` has produced `data/processed`.
 - **npm side effects stay in the repo.** `.npmrc` sets `cache=.npm-cache`. Temporary files go
@@ -154,10 +177,12 @@ Key conventions:
 
 ### Add a dataset the API serves (Phase 2 analysis data)
 
-1. Add its id to `DATASETS` in `packages/shared/src/registry.ts`. The server route accepts
-   it automatically.
-2. Emit `data/processed/<year>/<office>/<dataset>[/<fips>].json` from the pipeline.
-3. Web: fetch it through a hook in `src/data/api.ts`, mirroring `useResults`.
+1. Add it to `DATASET_INFO` in `packages/shared/src/registry.ts`, with `perOffice: true` if
+   it differs by office. `datasetPath()` then gives its file path, and the server route
+   accepts it automatically.
+2. Emit it from the pipeline with `emitDataset` (a national file + one file per state) and
+   list it in the manifest's `datasets`.
+3. Web: add a one-line hook in `src/data/api.ts` that calls `useDataset` (see `useProfiles`).
 
 ### Add a what-if control
 
@@ -188,8 +213,9 @@ is one module:
 - **Turnout:**
   - state VEP turnout (UF Election Lab) and county turnout (votes ÷ ACS CVAP)
   - turnout by group from CPS (people)
-- **Demographics** (places): a county profile next to the results, and scatters. Show the
-  ecological-fallacy note.
+- **Demographics** (places): done so far: ACS profiles for every state and county, joined
+  to results, and shown in the hover card with turnout. Next: scatters (result or swing vs. a
+  demographic), with the ecological-fallacy note.
 - **Polling:** final 538 average vs. result, as polling error by state
   (`fivethirtyeight/data/polls`).
 - **If only X voted** (people): CES validated voters, partial pooling, calibrated to actual
@@ -197,4 +223,11 @@ is one module:
 - Every analysis module declares its evidence type (places or people) and shows a shared
   evidence badge.
 
-Later phases: 3. Congress + governor 4. Money (FEC) 5. State legislatures 6. Live data (a `ResultsProvider` for AP/DDHQ) 7. Optional precinct layer 8. Candidate pages and compass
+Later phases:
+
+3. Congress + governor
+4. Money (FEC)
+5. State legislatures
+6. Live data (a `DataProvider` for AP/DDHQ)
+7. Optional precinct layer
+8. Candidate pages and compass

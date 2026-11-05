@@ -29,4 +29,8 @@ describe('normalizeCounties', () => {
   it('counts rows that have no county code', () => {
     expect(skips.noFips).toBe(fixture.expected.noFips);
   });
+
+  it('drops and reports rows whose county code belongs to another state', () => {
+    expect(skips.wrongState).toEqual(fixture.expected.wrongState);
+  });
 });

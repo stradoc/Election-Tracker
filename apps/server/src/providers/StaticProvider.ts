@@ -1,25 +1,33 @@
 /**
- * StaticProvider.ts: serves historical results from the pipeline's JSON output.
+ * StaticProvider.ts: serves historical data from the pipeline's JSON output.
  *
- * Server position: the ResultsProvider for every election up to 2024. Past results never
- * change, so each file is read from disk once and then kept in memory.
+ * Server position: the DataProvider for every election up to 2024. Files are read from
+ * data/processed at the paths the shared datasetPath() defines and kept in memory. Each
+ * cached file remembers its modification time, so after `npm run data` regenerates it the
+ * next request picks up the new version without restarting the server. Missing files
+ * aren't cached, so data generated while the server runs appears straight away.
  */
 
-import { existsSync } from 'node:fs';
-import { readFile } from 'node:fs/promises';
+import { stat, readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Manifest, ResultsDataset } from '@tippingpoint/shared';
-import type { DatasetKey, ResultsProvider } from './ResultsProvider.ts';
+import { datasetPath, type Dataset, type DatasetKey, type Manifest } from '@tippingpoint/shared';
+import type { DataProvider } from './DataProvider.ts';
 
 /** data/processed, resolved from this file (apps/server/src/providers/). */
 const DEFAULT_PROCESSED_DIR = fileURLToPath(
   new URL('../../../../data/processed/', import.meta.url),
 );
 
-/** Reads data/processed and caches every file it has read. */
-export class StaticProvider implements ResultsProvider {
-  private readonly cache = new Map<string, Promise<unknown>>();
+/** A parsed file and the modification time it was read at. */
+interface CacheEntry {
+  readonly modifiedMs: number;
+  readonly value: unknown;
+}
+
+/** Reads data/processed, caching each file until it changes on disk. */
+export class StaticProvider implements DataProvider {
+  private readonly cache = new Map<string, CacheEntry>();
   private readonly processedDir: string;
 
   /** @param processedDir override for tests; defaults to the repo's data/processed */
@@ -33,32 +41,29 @@ export class StaticProvider implements ResultsProvider {
     return manifest ?? { elections: [] };
   }
 
-  /** One dataset file, e.g. 2024/president/results.json or .../results/42.json. */
-  async dataset(key: DatasetKey): Promise<ResultsDataset | undefined> {
-    const base = path.join(String(key.year), key.office);
-    const relative =
-      key.stateFips === undefined
-        ? path.join(base, `${key.dataset}.json`)
-        : path.join(base, key.dataset, `${key.stateFips}.json`);
-    return this.readJson<ResultsDataset>(relative);
+  /** One dataset file, e.g. 2024/president/results.json or 2024/profiles/42.json. */
+  dataset(key: DatasetKey): Promise<Dataset<unknown> | undefined> {
+    return this.readJson<Dataset<unknown>>(datasetPath(key));
   }
 
-  /**
-   * Read and cache a JSON file under processedDir; undefined if it doesn't exist.
-   * The cache stores the pending promise, so simultaneous requests share one disk read.
-   */
-  private readJson<T>(relativePath: string): Promise<T | undefined> {
+  /** Read a JSON file under processedDir (cached until it changes); undefined if missing. */
+  private async readJson<T>(relativePath: string): Promise<T | undefined> {
+    const filePath = path.join(this.processedDir, relativePath);
+    const modifiedMs = await modificationTime(filePath);
+    if (modifiedMs === undefined) return undefined;
     const cached = this.cache.get(relativePath);
-    if (cached !== undefined) return cached as Promise<T | undefined>;
-    const pending = loadJson<T>(path.join(this.processedDir, relativePath));
-    this.cache.set(relativePath, pending);
-    return pending;
+    if (cached?.modifiedMs === modifiedMs) return cached.value as T;
+    const value = JSON.parse(await readFile(filePath, 'utf8')) as T;
+    this.cache.set(relativePath, { modifiedMs, value });
+    return value;
   }
 }
 
-/** Parse a JSON file, or return undefined if it doesn't exist. */
-async function loadJson<T>(filePath: string): Promise<T | undefined> {
-  if (!existsSync(filePath)) return undefined;
-  const text = await readFile(filePath, 'utf8');
-  return JSON.parse(text) as T;
+/** A file's modification time in ms, or undefined if it doesn't exist. */
+async function modificationTime(filePath: string): Promise<number | undefined> {
+  try {
+    return (await stat(filePath)).mtimeMs;
+  } catch {
+    return undefined;
+  }
 }

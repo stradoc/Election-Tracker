@@ -26,9 +26,12 @@ interface DataverseVersionResponse {
   };
 }
 
-/** Thrown when a file needs the owner to download it by hand (guestbook-protected). */
-export class ManualDownloadRequired extends Error {
-  override name = 'ManualDownloadRequired';
+/**
+ * Thrown when a source needs something only the owner can do: download a guestbook-protected
+ * file, or add an API key. run.ts prints the message and carries on without that source.
+ */
+export class OwnerActionRequired extends Error {
+  override name = 'OwnerActionRequired';
 }
 
 /**
@@ -36,7 +39,7 @@ export class ManualDownloadRequired extends Error {
  * Already-downloaded files are reused, so re-running the pipeline is fast and offline.
  *
  * @returns absolute path of the local file
- * @throws ManualDownloadRequired for guestbook-protected files that aren't present yet
+ * @throws OwnerActionRequired for guestbook-protected files that aren't present yet
  */
 export async function fetchDataverseFile(source: SourceInfo): Promise<string> {
   const spec = source.dataverse;
@@ -46,7 +49,7 @@ export async function fetchDataverseFile(source: SourceInfo): Promise<string> {
   if (existsSync(target)) return target;
 
   if (spec.guestbook) {
-    throw new ManualDownloadRequired(
+    throw new OwnerActionRequired(
       [
         `${source.id}: this file sits behind Dataverse's guestbook form, so download it once by hand:`,
         `  1. Open ${source.url}`,

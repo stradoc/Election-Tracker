@@ -34,6 +34,18 @@ describe.skipIf(!hasProcessedData)('API with generated data', () => {
     expect(response.json()).toHaveLength(cases.electionCount);
   });
 
+  it('lists profiles among the generated datasets', async () => {
+    const response = await app.inject({ url: '/api/elections' });
+    const elections = response.json<{ datasets: string[] }[]>();
+    expect(elections.every((e) => e.datasets.includes('profiles'))).toBe(true);
+  });
+
+  it("serves one state's county profiles", async () => {
+    const response = await app.inject({ url: cases.profilesUrl });
+    expect(response.statusCode).toBe(cases.status.ok);
+    expect(response.json<{ places: unknown[] }>().places).toHaveLength(cases.profilesPlaces);
+  });
+
   it('serves the national results file with cache headers', async () => {
     const response = await app.inject({ url: cases.nationalUrl });
     expect(response.statusCode).toBe(cases.status.ok);

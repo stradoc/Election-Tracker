@@ -3,10 +3,11 @@
  *
  * Server position: the only HTTP surface.
  *   GET /api/elections                          registry ∩ manifest: what the app can show
- *   GET /api/:year/:office/:dataset             national file (states + ME/NE districts)
+ *   GET /api/:year/:office/:dataset             national file (states, + ME/NE districts)
  *   GET /api/:year/:office/:dataset/:stateFips  one state's counties
- * New datasets (Phase 2: profiles, turnout, groups, polls) are new DATASETS entries in the
- * shared registry, not new routes.
+ * Datasets today: results, profiles (ACS demographics; the same for every office in a
+ * year). New datasets (turnout, groups, polls) are new DATASET_INFO entries in the shared
+ * registry, not new routes.
  */
 
 import type { FastifyInstance, FastifyReply } from 'fastify';
@@ -18,7 +19,7 @@ import {
   type DatasetId,
   type Office,
 } from '@tippingpoint/shared';
-import type { ResultsProvider } from '../providers/ResultsProvider.ts';
+import type { DataProvider } from '../providers/DataProvider.ts';
 
 /** Historical results never change, so browsers and CDNs may cache them for a day. */
 const CACHE_SECONDS = 86_400;
@@ -45,14 +46,16 @@ function isDatasetId(value: string): value is DatasetId {
 }
 
 /** Register all API routes on a Fastify instance. */
-export function registerRoutes(app: FastifyInstance, provider: ResultsProvider): void {
+export function registerRoutes(app: FastifyInstance, provider: DataProvider): void {
   app.get('/api/elections', async () => {
     const manifest = await provider.manifest();
     return ELECTIONS.flatMap((election) => {
       const generated = manifest.elections.find(
         (entry) => entry.year === election.year && entry.office === election.office,
       );
-      return generated === undefined ? [] : [{ ...election, countyStates: generated.countyStates }];
+      return generated === undefined
+        ? []
+        : [{ ...election, countyStates: generated.countyStates, datasets: generated.datasets }];
     });
   });
 

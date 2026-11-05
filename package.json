@@ -18,6 +18,7 @@
     "data": "npm run pipeline -w @tippingpoint/data --",
     "test": "vitest run",
     "test:watch": "vitest",
+    "e2e": "node apps/web/e2e/map-check.ts",
     "typecheck": "tsc -p packages/shared && tsc -p scripts/data && tsc -p apps/server && tsc -p apps/web",
     "lint": "eslint .",
     "format": "prettier --write ."

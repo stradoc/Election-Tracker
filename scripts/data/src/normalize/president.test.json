@@ -1,5 +1,5 @@
 {
-  "_about": "Synthetic MEDSL county rows for president.test.ts. Numbers are made up; each block exercises one rule in normalizeCounties.",
+  "_about": "Synthetic MEDSL county rows for president.test.ts. Numbers are made up (Jackson/Kansas City mirror 2024's shape); each block exercises one rule in normalizeCounties.",
   "election": {
     "year": 2020,
     "office": "president",
@@ -7,7 +7,8 @@
       "dem": "Joe Biden",
       "rep": "Donald Trump"
     },
-    "sources": []
+    "sources": [],
+    "acsVintage": 2020
   },
   "rows": [
     {
@@ -159,10 +160,61 @@
       "candidate": "JOSEPH R BIDEN JR",
       "candidatevotes": "1",
       "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "MO",
+      "county_name": "JACKSON",
+      "county_fips": "29095",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "91366",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "MO",
+      "county_name": "JACKSON",
+      "county_fips": "29095",
+      "candidate": "DONALD J TRUMP",
+      "candidatevotes": "99385",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "MO",
+      "county_name": "KANSAS CITY",
+      "county_fips": "36000",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "95660",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "MO",
+      "county_name": "KANSAS CITY",
+      "county_fips": "36000",
+      "candidate": "DONALD J TRUMP",
+      "candidatevotes": "26225",
+      "mode": "TOTAL"
+    },
+    {
+      "year": "2020",
+      "office": "US PRESIDENT",
+      "state_po": "TX",
+      "county_name": "MISCODED",
+      "county_fips": "39049",
+      "candidate": "JOSEPH R BIDEN JR",
+      "candidatevotes": "1000",
+      "mode": "TOTAL"
     }
   ],
   "expected": {
     "states": [
+      "29",
       "42",
       "46"
     ],
@@ -187,8 +239,18 @@
         "rep": 255,
         "other": 0,
         "total": 3084
+      },
+      "29095": {
+        "name": "Jackson",
+        "dem": 187026,
+        "rep": 125610,
+        "other": 0,
+        "total": 312636
       }
     },
-    "noFips": 1
+    "noFips": 1,
+    "wrongState": [
+      "TX:39049"
+    ]
   }
 }

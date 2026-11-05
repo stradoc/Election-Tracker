@@ -76,8 +76,22 @@ interface Tally {
 export interface CountySkips {
   /** Rows with no usable county code (e.g. statewide overseas ballots). */
   noFips: number;
+  /**
+   * "<postal>:<code>" for rows whose county code belongs to a different state than the row
+   * says (a source coding error). They are dropped rather than credited to the wrong state;
+   * fix each one with a remap in county-fips-fixes.json.
+   */
+  wrongState: string[];
   /** States whose county rows are dropped on purpose (shared NO_COUNTY_LAYER), with reasons. */
   skippedStates: Record<string, string>;
+}
+
+/** A county row with the map code it resolved to. */
+interface ResolvedRow {
+  row: MedslCountyRow;
+  fips: string;
+  /** True when county-fips-fixes.json changed the code (e.g. Kansas City → Jackson County). */
+  remapped: boolean;
 }
 
 /** Parse a CSV file with a header row into objects keyed by column name. */
@@ -193,49 +207,70 @@ export function normalizeCounties(
   election: ElectionEntry,
 ): { byState: Map<string, PlaceResult[]>; skips: CountySkips } {
   const electionRows = rowsForElection(rows, election);
-  const withFips = electionRows
-    .map((row) => ({ row, fips: countyFips(row.county_fips) }))
-    .filter((entry): entry is { row: MedslCountyRow; fips: string } => entry.fips !== undefined);
-  const placeable = withFips.filter(({ fips }) => NO_COUNTY_LAYER[fips.slice(0, STATE_FIPS_DIGITS)] === undefined);
+  const resolved = electionRows
+    .map((row) => resolveCounty(row))
+    .filter((entry): entry is ResolvedRow => entry !== undefined);
+  const inOwnState = resolved.filter((entry) => belongsToRowState(entry));
+  const placeable = inOwnState.filter(
+    ({ fips }) => NO_COUNTY_LAYER[fips.slice(0, STATE_FIPS_DIGITS)] === undefined,
+  );
 
   const byCounty = Map.groupBy(placeable, ({ fips }) => fips);
   const counties = [...byCounty.entries()].map(([fips, entries]) =>
-    countyPlace(fips, entries.map((e) => e.row), election.candidates),
+    countyPlace(fips, entries, election.candidates),
   );
+
+  const wrongState = resolved
+    .filter((entry) => !belongsToRowState(entry))
+    .map(({ row }) => `${row.state_po}:${row.county_fips}`);
 
   return {
     byState: Map.groupBy(counties, (county) => county.stateFips),
     skips: {
-      noFips: electionRows.length - withFips.length,
+      noFips: electionRows.length - resolved.length,
+      wrongState: [...new Set(wrongState)].sort(),
       skippedStates: { ...NO_COUNTY_LAYER },
     },
   };
 }
 
-/** Build one county's PlaceResult, using TOTAL rows when the county reports them. */
-function countyPlace(fips: string, rows: readonly MedslCountyRow[], nominees: Nominees): PlaceResult {
+/** Whether a row's county code is in the state the row itself names. */
+function belongsToRowState({ row, fips }: ResolvedRow): boolean {
+  return stateByPostal(row.state_po)?.fips === fips.slice(0, STATE_FIPS_DIGITS);
+}
+
+/**
+ * Build one county's PlaceResult, using TOTAL rows when the county reports them.
+ * The name comes from a row that wasn't remapped, so Jackson County keeps its own name
+ * even though Kansas City's rows are merged into it.
+ */
+function countyPlace(fips: string, entries: readonly ResolvedRow[], nominees: Nominees): PlaceResult {
+  const rows = entries.map((entry) => entry.row);
   const hasTotalRows = rows.some((row) => row.mode === TOTAL_MODE);
   const counted = hasTotalRows ? rows.filter((row) => row.mode === TOTAL_MODE) : rows;
+  const nameRow = entries.find((entry) => !entry.remapped)?.row ?? rows[0];
   const stateFips = fips.slice(0, STATE_FIPS_DIGITS);
   if (stateByFips(stateFips) === undefined) throw new Error(`Unknown state in county code ${fips}`);
   return {
     geoId: fips,
     level: 'county',
-    name: titleCase(rows[0]?.county_name ?? fips),
+    name: titleCase(nameRow?.county_name ?? fips),
     stateFips,
     ...tally(counted, nominees),
   };
 }
 
 /**
- * Turn MEDSL's county code into the map's 5-digit FIPS, applying documented remaps.
- * Returns undefined for rows with no county (MEDSL writes "NA" for statewide ballots).
+ * Turn a row's MEDSL county code into the map's 5-digit FIPS, applying the documented
+ * state-specific remaps. Returns undefined for rows with no county (MEDSL writes "NA"
+ * for statewide ballots).
  */
-function countyFips(raw: string): string | undefined {
-  const numeric = Number(raw);
-  if (raw === '' || !Number.isInteger(numeric)) return undefined;
+function resolveCounty(row: MedslCountyRow): ResolvedRow | undefined {
+  const numeric = Number(row.county_fips);
+  if (row.county_fips === '' || !Number.isInteger(numeric)) return undefined;
   const padded = String(numeric).padStart(COUNTY_FIPS_DIGITS, '0');
-  return COUNTY_REMAP[padded]?.to ?? padded;
+  const remap = COUNTY_REMAP[`${row.state_po}:${padded}`];
+  return { row, fips: remap?.to ?? padded, remapped: remap !== undefined };
 }
 
 /** "ST. LOUIS CITY" → "St. Louis City". */

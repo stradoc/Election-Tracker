@@ -9,7 +9,7 @@
  * All numbers shown pass through computeScenario() from the shared package.
  */
 
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router';
 import {
   computeScenario,
@@ -28,7 +28,7 @@ import { ResultsTable } from '../components/ResultsTable.tsx';
 import { SegmentedControl } from '../components/SegmentedControl.tsx';
 import { MAX_SWING_POINTS, SwingSlider } from '../components/SwingSlider.tsx';
 import { TippingPointNote } from '../components/TippingPointNote.tsx';
-import { isNotFound, useElections, useResults } from '../data/api.ts';
+import { isNotFound, useElections, useProfiles, useResults } from '../data/api.ts';
 import { leadLabel } from '../format.ts';
 import { UsMap } from '../map/UsMap.tsx';
 import { ThemeToggle } from '../theme/ThemeToggle.tsx';
@@ -59,7 +59,14 @@ export function ElectionPage() {
   const year = Number(params.year);
   const office = (params.office ?? 'president') as Office;
   const selected = params.state === undefined ? undefined : stateByPostal(params.state);
-  const swingPoints = swingFromUrl(search.get('swing'));
+
+  // The URL is the source of truth for the swing, but the router updates it asynchronously.
+  // A slider bound straight to the URL snaps back between key presses or drag steps, so the
+  // slider keeps its own value (updated instantly) and follows the URL whenever it changes
+  // from elsewhere (back button, a shared link).
+  const urlSwing = swingFromUrl(search.get('swing'));
+  const [swingPoints, setSwingPoints] = useState(urlSwing);
+  useEffect(() => setSwingPoints(urlSwing), [urlSwing]);
 
   const elections = useElections();
   const listing = elections.data?.find((e) => e.year === year && e.office === office);
@@ -67,6 +74,19 @@ export function ElectionPage() {
     selected !== undefined && (listing?.countyStates.includes(selected.fips) ?? false);
   const national = useResults(year, office, undefined, listing !== undefined);
   const counties = useResults(year, office, selected?.fips, hasCounties);
+  const hasProfiles = listing?.datasets.includes('profiles') ?? false;
+  const stateProfiles = useProfiles(year, office, undefined, hasProfiles);
+  const countyProfiles = useProfiles(year, office, selected?.fips, hasProfiles && hasCounties);
+  // One lookup by geoId for the hover card: every state, plus the open state's counties.
+  const profiles = useMemo(
+    () =>
+      new Map(
+        [...(stateProfiles.data?.places ?? []), ...(countyProfiles.data?.places ?? [])].map(
+          (profile) => [profile.geoId, profile],
+        ),
+      ),
+    [stateProfiles.data, countyProfiles.data],
+  );
 
   const scenario: Scenario = useMemo(() => ({ swing: swingPoints / PERCENT }), [swingPoints]);
   const nationalView = useMemo(
@@ -86,6 +106,7 @@ export function ElectionPage() {
   };
 
   const setSwing = (points: number): void => {
+    setSwingPoints(points);
     setSearch(
       (previous) => {
         const next = new URLSearchParams(previous);
@@ -207,6 +228,8 @@ export function ElectionPage() {
               selectedStateFips={selected?.fips}
               tippingPointId={nationalView.tippingPointId}
               nominees={nominees}
+              countyStates={listing?.countyStates ?? []}
+              profiles={profiles}
               onSelectState={goTo}
             />
             {countyMessage !== undefined && <p className={styles.notice}>{countyMessage}</p>}

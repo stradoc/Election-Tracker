@@ -52,22 +52,58 @@ export interface SourceRef {
 }
 
 /**
- * One results file as emitted by the pipeline and served by the API, for one office in
- * one year.
- * - scope "national": every state, plus ME/NE electoral-vote districts for president.
+ * Demographics of one place (a state or a county), from the Census Bureau's American
+ * Community Survey 5-year estimates. Shares are fractions (0.32 = 32%).
+ *
+ * This is "places" evidence: it describes who lives in a place, not how any group voted.
+ * Comparing it with results shows how places with more of a group voted.
+ */
+export interface GeoProfile {
+  /** Same ids as PlaceResult: 2-digit state FIPS or 5-digit county FIPS. */
+  geoId: string;
+  level: 'state' | 'county';
+  name: string;
+  stateFips: string;
+  /** The ACS 5-year survey period, e.g. "2020–2024". */
+  period: string;
+  population: number;
+  /** Citizens aged 18 and over (citizen voting-age population): the turnout denominator. */
+  cvap: number;
+  /** Shares of the whole population, by race and ethnicity. */
+  whiteNonHispanic: number;
+  blackNonHispanic: number;
+  hispanic: number;
+  asianNonHispanic: number;
+  /** Share of adults 25 and over with a bachelor's degree or higher. */
+  bachelorsOrHigher: number;
+  /** In dollars of the survey's final year (see `period`); null where the Census suppresses it. */
+  medianHouseholdIncome: number | null;
+  medianAge: number | null;
+}
+
+/**
+ * One data file as emitted by the pipeline and served by the API.
+ * - scope "national": every state (plus ME/NE districts for presidential results).
  * - scope "state": every county in one state (`stateFips` is set).
  */
-export interface ResultsDataset {
+export interface Dataset<Place> {
   year: number;
-  office: Office;
   scope: 'national' | 'state';
   /** Set when scope is "state". */
   stateFips?: string;
-  /** Major-party nominees. For president these apply to every place. */
-  candidates: { dem: string; rep: string };
-  places: PlaceResult[];
+  places: Place[];
   sources: SourceRef[];
 }
+
+/** Election results for one office in one year. */
+export interface ResultsDataset extends Dataset<PlaceResult> {
+  office: Office;
+  /** Major-party nominees. For president these apply to every place. */
+  candidates: { dem: string; rep: string };
+}
+
+/** Demographic profiles matched to one election year (the same for every office). */
+export type ProfilesDataset = Dataset<GeoProfile>;
 
 /**
  * What the pipeline produced for one election. The server answers only for elections
@@ -81,6 +117,8 @@ export interface ManifestEntry {
    * hasn't been downloaded yet (the map then shows states only).
    */
   countyStates: string[];
+  /** Datasets generated for this election, e.g. ["results", "profiles"]. */
+  datasets: string[];
 }
 
 /** data/processed/manifest.json: everything the pipeline generated in its last run. */

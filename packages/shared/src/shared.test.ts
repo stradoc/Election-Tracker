@@ -16,6 +16,8 @@ import { formatMargin, marginOf } from './margins.ts';
 import { computeScenario } from './scenario.ts';
 import type { PlaceResult } from './schema.ts';
 import { applyUniformSwing } from './swing.ts';
+import { datasetPath, type DatasetKey } from './registry.ts';
+import { turnoutRate } from './turnout.ts';
 
 /** Every toy state has this many votes; fixtures give vote shares in percent of it. */
 const TOY_TOTAL_VOTES = 1000;
@@ -135,5 +137,24 @@ describe('scenario engine', () => {
     const { electoral } = computeScenario(map, { swing });
     expect(electoral.dem).toBe(dem);
     expect(electoral.rep).toBe(rep);
+  });
+});
+
+describe('dataset paths', () => {
+  it.each(cases.datasetPath)('$path', ({ key, path }) => {
+    expect(datasetPath(key as DatasetKey)).toBe(path);
+  });
+});
+
+describe('turnout', () => {
+  const { votes, cvap, rate } = cases.turnout;
+
+  it('divides votes cast by citizens 18+', () => {
+    expect(turnoutRate({ total: votes }, { cvap })).toBe(rate);
+  });
+
+  it('is unknown without a profile or with zero citizens', () => {
+    expect(turnoutRate({ total: votes }, undefined)).toBeUndefined();
+    expect(turnoutRate({ total: votes }, { cvap: 0 })).toBeUndefined();
   });
 });

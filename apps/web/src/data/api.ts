@@ -8,11 +8,19 @@
  */
 
 import { useQuery } from '@tanstack/react-query';
-import type { ElectionEntry, Office, ResultsDataset } from '@tippingpoint/shared';
+import type {
+  DatasetId,
+  ElectionEntry,
+  Office,
+  ProfilesDataset,
+  ResultsDataset,
+} from '@tippingpoint/shared';
 
 /** An election the API can serve, with the states that have county files. */
 export interface ElectionListing extends ElectionEntry {
   readonly countyStates: readonly string[];
+  /** Datasets generated for it, e.g. ["results", "profiles"]. */
+  readonly datasets: readonly DatasetId[];
 }
 
 /** A failed API request, with the HTTP status so callers can tell "missing" from "broken". */
@@ -62,17 +70,34 @@ export function useElections() {
 }
 
 /**
- * Results for one election: the national file, or one state's counties.
- * @param stateFips omit for states + districts; set for that state's counties
+ * Any dataset for one election: the national file, or one state's counties. Every
+ * dataset hook below is this one with a type; new datasets need no new fetching code.
+ * @param stateFips omit for the national file; set for that state's counties
  * @param enabled pass false to wait (e.g. until the user opens a state)
  */
-export function useResults(year: number, office: Office, stateFips?: string, enabled = true) {
-  const path = `/api/${year}/${office}/results${stateFips === undefined ? '' : `/${stateFips}`}`;
+function useDataset<T>(
+  dataset: DatasetId,
+  year: number,
+  office: Office,
+  stateFips: string | undefined,
+  enabled: boolean,
+) {
+  const suffix = stateFips === undefined ? '' : `/${stateFips}`;
   return useQuery({
-    queryKey: ['results', year, office, stateFips ?? 'national'],
-    queryFn: () => fetchJson<ResultsDataset>(path),
+    queryKey: [dataset, year, office, stateFips ?? 'national'],
+    queryFn: () => fetchJson<T>(`/api/${year}/${office}/${dataset}${suffix}`),
     staleTime: Infinity,
     retry: shouldRetry,
     enabled,
   });
+}
+
+/** Election results: states + ME/NE districts, or one state's counties. */
+export function useResults(year: number, office: Office, stateFips?: string, enabled = true) {
+  return useDataset<ResultsDataset>('results', year, office, stateFips, enabled);
+}
+
+/** ACS demographic profiles matched to the election year: states, or one state's counties. */
+export function useProfiles(year: number, office: Office, stateFips?: string, enabled = true) {
+  return useDataset<ProfilesDataset>('profiles', year, office, stateFips, enabled);
 }

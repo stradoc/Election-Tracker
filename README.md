@@ -16,6 +16,8 @@ Requires Node.js 22.18 or newer.
 npm install
 npm run data   # downloads MIT Election Lab data and builds data/processed
 npm run dev    # opens the API on :8787 and the site on http://localhost:5173
+npm test       # unit tests
+npm run e2e    # with the site running: clicks through it in headless Chrome
 ```
 
 ### County results (one manual step)
@@ -24,10 +26,20 @@ The MIT Election Lab county file requires a short guestbook form before download
 script can't fetch it:
 
 1. Open <https://doi.org/10.7910/DVN/VOQCHQ> and download `countypres_2000-2024.csv`.
-2. Save it as `data/raw/medsl-president-county/countypres_2000-2024.csv`.
+2. Save it as `data/raw/medsl-president-county/countypres_2000-2024.csv`. Note the folder:
+   `medsl-president-county`, not `medsl-president-state`.
 3. Run `npm run data` again.
 
 Until then the map shows states only.
+
+### Demographics (free Census API key)
+
+County demographics (education, race and ethnicity, income, turnout) come from the Census
+Bureau's American Community Survey:
+
+1. Get a free key at <https://api.census.gov/data/key_signup.html>.
+2. Copy `scripts/data/.env.example` to `scripts/data/.env` and set `CENSUS_API_KEY`.
+3. Run `npm run data`.
 
 ## Data
 
@@ -38,6 +50,8 @@ repository.
   1976–2024 and County Presidential Returns 2000–2024 (CC0).
 - **Maine and Nebraska district results:** state certificates of ascertainment (National
   Archives) and official state canvass reports.
+- **Demographics:** U.S. Census Bureau, American Community Survey 5-year estimates (public
+  domain), matched to each election year.
 - **Map shapes:** [us-atlas](https://github.com/topojson/us-atlas), from U.S. Census Bureau
   boundary files.
 

@@ -72,6 +72,16 @@ export const SOURCES = {
       "Curated by hand in scripts/data/sources/ev-districts.ts because MEDSL's state file " +
       'has no district rows. Each figure cites the certified canvass it came from.',
   },
+  'census-acs5': {
+    id: 'census-acs5',
+    title: 'American Community Survey 5-year estimates',
+    publisher: 'U.S. Census Bureau (via the Census Data API)',
+    url: 'https://www.census.gov/programs-surveys/acs',
+    license: 'Public domain (U.S. government work)',
+    notes:
+      'Variables and survey periods are listed in scripts/data/src/sources/acs.json. ' +
+      'Needs a free API key in scripts/data/.env (CENSUS_API_KEY).',
+  },
   'us-atlas': {
     id: 'us-atlas',
     title: 'us-atlas v3 (counties-albers-10m)',

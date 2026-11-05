@@ -7,6 +7,7 @@
 
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { datasetPath, type DatasetKey } from '@tippingpoint/shared';
 
 /** Repository root (this file is at scripts/data/src/paths.ts). */
 export const REPO_ROOT = fileURLToPath(new URL('../../../', import.meta.url));
@@ -23,17 +24,10 @@ export function rawDirFor(sourceId: string): string {
 }
 
 /**
- * Output path for one dataset, e.g. data/processed/2024/president/results.json, or with a
- * state, data/processed/2024/president/results/42.json (Pennsylvania's counties).
+ * Absolute output path for one dataset file. The layout itself (which folders, which
+ * datasets are per office) is defined once in the shared datasetPath(), which the server
+ * also uses to read the files.
  */
-export function processedPathFor(
-  year: number,
-  office: string,
-  dataset: string,
-  stateFips?: string,
-): string {
-  const base = path.join(PROCESSED_DIR, String(year), office);
-  return stateFips === undefined
-    ? path.join(base, `${dataset}.json`)
-    : path.join(base, dataset, `${stateFips}.json`);
+export function processedPathFor(key: DatasetKey): string {
+  return path.join(PROCESSED_DIR, datasetPath(key));
 }
