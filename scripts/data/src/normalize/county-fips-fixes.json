@@ -1,0 +1,17 @@
+{
+  "_about": "Remaps from codes MEDSL uses to the county FIPS codes in the us-atlas map. Loaded by president.ts. Each entry says why. States with no county results at all are listed in packages/shared/data/no-county-layer.json.",
+  "remap": {
+    "46113": {
+      "to": "46102",
+      "why": "Shannon County, SD was renamed Oglala Lakota County in 2015 and given a new code."
+    },
+    "51515": {
+      "to": "51019",
+      "why": "Bedford city, VA merged into Bedford County in 2013."
+    },
+    "2938000": {
+      "to": "29095",
+      "why": "Kansas City, MO reports separately from Jackson County; its votes are cast in Jackson County, and the map has no separate Kansas City shape."
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "_about": "Elections TippingPoint covers. Loaded and documented by src/registry.ts. Add a row to add a year; the pipeline checks nominee surnames against the source data.",
+  "president": [
+    {
+      "year": 2024,
+      "dem": "Kamala Harris",
+      "rep": "Donald Trump"
+    },
+    {
+      "year": 2020,
+      "dem": "Joe Biden",
+      "rep": "Donald Trump"
+    },
+    {
+      "year": 2016,
+      "dem": "Hillary Clinton",
+      "rep": "Donald Trump"
+    }
+  ]
+}

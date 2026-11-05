@@ -1,0 +1,11 @@
+{
+  "name": "@tippingpoint/shared",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Types, registries and election math shared by the pipeline, server and web app.",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

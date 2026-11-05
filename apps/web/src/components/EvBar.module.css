@@ -1,0 +1,104 @@
+/*
+ * EvBar.module.css: nominee names and big counts at each end, the bar between them.
+ * Grid areas put Dem left and Rep right on every screen size.
+ */
+
+.bar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    'dem rep'
+    'track track';
+  row-gap: var(--space-3);
+}
+
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.side[data-side='dem'] {
+  grid-area: dem;
+}
+
+.side[data-side='rep'] {
+  grid-area: rep;
+  align-items: flex-end;
+  text-align: right;
+}
+
+.name {
+  font-size: var(--text-sm);
+  color: var(--ink-muted);
+}
+
+.side[data-winner='true'] .name {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.count {
+  font-family: var(--font-display);
+  font-size: clamp(var(--text-2xl), 7vw, var(--text-3xl));
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.side[data-side='dem'] .count {
+  color: var(--dem);
+}
+
+.side[data-side='rep'] .count {
+  color: var(--rep);
+}
+
+.track {
+  grid-area: track;
+  position: relative;
+  height: 14px;
+  background: var(--track);
+  border-radius: 4px;
+}
+
+.dem,
+.rep {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  transition: width var(--dur-measure) var(--ease-settle);
+}
+
+.dem {
+  left: 0;
+  background: var(--dem);
+  border-radius: 4px 0 0 4px;
+}
+
+.rep {
+  right: 0;
+  background: var(--rep);
+  border-radius: 0 4px 4px 0;
+}
+
+/* The majority line, drawn over both segments with a surface-coloured gap around it. */
+.majority {
+  position: absolute;
+  top: -6px;
+  bottom: -6px;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--ink);
+  box-shadow: 0 0 0 2px var(--canvas);
+}
+
+.majority span {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--text-xs);
+  color: var(--ink-muted);
+  white-space: nowrap;
+}

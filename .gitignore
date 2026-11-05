@@ -1,0 +1,23 @@
+# Dependencies and tool caches (kept inside the repo by .npmrc, see RULES.md rule 2)
+node_modules/
+.npm-cache/
+.tmp/
+
+# Data: third-party datasets are never committed. The pipeline downloads them into
+# data/raw and regenerates data/processed (see AGENTS.md -> Data pipeline).
+data/raw/
+data/processed/
+
+# Build output
+dist/
+*.tsbuildinfo
+coverage/
+
+# Secrets (API keys). Copy apps/server/.env.example to apps/server/.env.
+.env
+.env.*
+!.env.example
+
+# Editor / OS noise
+.DS_Store
+*.log

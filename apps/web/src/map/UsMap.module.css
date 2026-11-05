@@ -1,0 +1,81 @@
+/*
+ * UsMap.module.css: map shapes. Fill colours come from data-bin (map/bins.css); every
+ * stroke uses non-scaling-stroke so borders stay crisp while the map is zoomed in.
+ */
+
+.frame {
+  position: relative;
+  width: 100%;
+}
+
+/* Clip the zoomed-in map to the frame so neighbouring states never spill over the page. */
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+  touch-action: manipulation;
+}
+
+.loading {
+  aspect-ratio: 975 / 610;
+  display: grid;
+  place-items: center;
+  color: var(--ink-muted);
+}
+
+.state,
+.county {
+  fill: var(--bin-fill);
+  stroke: var(--map-border);
+  stroke-width: 1px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  /* Fill eases with the swing slider so states visibly "tip" rather than blink. */
+  transition:
+    fill var(--dur-measure) var(--ease-settle),
+    opacity var(--dur-base) var(--ease-press);
+}
+
+.state:focus {
+  outline: none;
+}
+
+.state[data-dimmed='true'] {
+  opacity: var(--map-dimmed-opacity);
+}
+
+.county {
+  stroke: var(--map-county-border);
+  stroke-width: 0.6px;
+}
+
+.counties {
+  animation: counties-in var(--dur-zoom) var(--ease-settle);
+}
+
+@keyframes counties-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Drawn on top of every shape so the outline is never hidden under a neighbour. */
+.tipping {
+  fill: none;
+  stroke: var(--map-tipping-outline);
+  stroke-width: 2.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.hoverOutline {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}

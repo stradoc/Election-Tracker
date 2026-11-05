@@ -1,0 +1,16 @@
+{
+  "name": "@tippingpoint/server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API server: serves pipeline output from data/processed.",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.ts",
+    "start": "node src/index.ts"
+  },
+  "dependencies": {
+    "@tippingpoint/shared": "*",
+    "fastify": "^5.12.8"
+  }
+}

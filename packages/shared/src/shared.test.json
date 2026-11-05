@@ -1,0 +1,164 @@
+{
+  "_about": "Test cases for shared.test.ts. Places are toy states of 1,000 votes, given as vote percentages plus electoral votes.",
+  "evTables": {
+    "years": [2016, 2020, 2024],
+    "jurisdictions": 51,
+    "totalVotes": 538,
+    "spotChecks": [
+      {
+        "year": 2020,
+        "postal": "PA",
+        "votes": 20
+      },
+      {
+        "year": 2024,
+        "postal": "PA",
+        "votes": 19
+      },
+      {
+        "year": 2024,
+        "postal": "TX",
+        "votes": 40
+      }
+    ],
+    "atLarge": [
+      {
+        "year": 2024,
+        "postal": "ME",
+        "votes": 2
+      },
+      {
+        "year": 2024,
+        "postal": "NE",
+        "votes": 2
+      },
+      {
+        "year": 2024,
+        "postal": "PA",
+        "votes": 19
+      }
+    ],
+    "unsupportedYear": 1996
+  },
+  "formatMargin": [
+    {
+      "margin": 0.0321,
+      "label": "D+3.2"
+    },
+    {
+      "margin": -0.0172,
+      "label": "R+1.7"
+    },
+    {
+      "margin": 0.0004,
+      "label": "Even"
+    }
+  ],
+  "swing": {
+    "places": [
+      {
+        "geoId": "A",
+        "demPct": 49,
+        "repPct": 50,
+        "ev": 10
+      },
+      {
+        "geoId": "B",
+        "demPct": 60,
+        "repPct": 38,
+        "ev": 5
+      }
+    ],
+    "swing": 0.02,
+    "extremeSwing": -1,
+    "precisionDigits": 10
+  },
+  "electoral": {
+    "_note": "9-EV toy map, majority line 5. Dem path: safeD (3) + leanD (2) = 5, so leanD tips it.",
+    "map": [
+      {
+        "geoId": "safeD",
+        "demPct": 70,
+        "repPct": 30,
+        "ev": 3
+      },
+      {
+        "geoId": "leanD",
+        "demPct": 51,
+        "repPct": 48,
+        "ev": 2
+      },
+      {
+        "geoId": "leanR",
+        "demPct": 48,
+        "repPct": 51,
+        "ev": 2
+      },
+      {
+        "geoId": "safeR",
+        "demPct": 35,
+        "repPct": 65,
+        "ev": 2
+      }
+    ],
+    "expectedTotals": {
+      "dem": 5,
+      "rep": 4,
+      "tied": 0,
+      "total": 9,
+      "needed": 5
+    },
+    "tippingPoint": "leanD",
+    "noMajorityMap": [
+      {
+        "geoId": "X",
+        "demPct": 51,
+        "repPct": 49,
+        "ev": 2
+      },
+      {
+        "geoId": "Y",
+        "demPct": 49,
+        "repPct": 51,
+        "ev": 2
+      }
+    ],
+    "majority": {
+      "of": 538,
+      "is": 270
+    }
+  },
+  "scenario": {
+    "_note": "leanD is D+3, so it flips just past a 3-point swing to the right.",
+    "map": [
+      {
+        "geoId": "leanD",
+        "demPct": 51,
+        "repPct": 48,
+        "ev": 6
+      },
+      {
+        "geoId": "leanR",
+        "demPct": 48.5,
+        "repPct": 50,
+        "ev": 5
+      }
+    ],
+    "actual": {
+      "dem": 6,
+      "tippingPoint": "leanD"
+    },
+    "flips": [
+      {
+        "swing": -0.029,
+        "dem": 6,
+        "rep": 5
+      },
+      {
+        "swing": -0.031,
+        "dem": 0,
+        "rep": 11
+      }
+    ]
+  }
+}
