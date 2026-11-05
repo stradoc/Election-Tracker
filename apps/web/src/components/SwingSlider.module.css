@@ -40,13 +40,13 @@
 .range::-webkit-slider-runnable-track {
   height: 6px;
   border-radius: var(--radius-pill);
-  background: linear-gradient(90deg, var(--rep), var(--map-tossup) 50%, var(--dem));
+  background: linear-gradient(90deg, var(--rep), var(--map-tie) 50%, var(--dem));
 }
 
 .range::-moz-range-track {
   height: 6px;
   border-radius: var(--radius-pill);
-  background: linear-gradient(90deg, var(--rep), var(--map-tossup) 50%, var(--dem));
+  background: linear-gradient(90deg, var(--rep), var(--map-tie) 50%, var(--dem));
 }
 
 .range::-webkit-slider-thumb {

@@ -1,5 +1,5 @@
 {
-  "_about": "Margin thresholds for the map colour steps, as fractions of all votes. A place at or above thresholds[i] (but below the next) gets step i+1; below the first it is a toss-up. Loaded by marginBins.ts; colours per step are in styles/tokens.css (--map-d1..5, --map-r1..5). labels[0] is the toss-up band, then one label per step.",
+  "_about": "Map colour steps, as fractions of all votes. Every place is coloured for whoever leads it: step 1 is a lead under thresholds[0], step i+1 a lead of at least thresholds[i]. Only an exact tie gets the neutral colour. Loaded by marginBins.ts; colours per step are in styles/tokens.css (--map-d1..6, --map-r1..6, --map-tie). labels has one entry per step.",
   "thresholds": [0.01, 0.02, 0.05, 0.1, 0.2],
-  "labels": ["Under 1", "1–2", "2–5", "5–10", "10–20", "20+"]
+  "labels": ["0–1", "1–2", "2–5", "5–10", "10–20", "20+"]
 }

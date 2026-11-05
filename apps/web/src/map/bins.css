@@ -3,11 +3,11 @@
  *
  * Any element with data-bin="d3" gets --bin-fill set to the matching map token. SVG
  * paths use it as `fill`, HTML tiles and legend swatches as `background`, so every place
- * that shows a margin colour uses the same lookup.
+ * that shows a margin colour uses the same lookup. "tie" is only for an exact tie.
  */
 
-[data-bin='tossup'] {
-  --bin-fill: var(--map-tossup);
+[data-bin='tie'] {
+  --bin-fill: var(--map-tie);
 }
 [data-bin='d1'] {
   --bin-fill: var(--map-d1);
@@ -24,6 +24,9 @@
 [data-bin='d5'] {
   --bin-fill: var(--map-d5);
 }
+[data-bin='d6'] {
+  --bin-fill: var(--map-d6);
+}
 [data-bin='r1'] {
   --bin-fill: var(--map-r1);
 }
@@ -38,4 +41,7 @@
 }
 [data-bin='r5'] {
   --bin-fill: var(--map-r5);
+}
+[data-bin='r6'] {
+  --bin-fill: var(--map-r6);
 }

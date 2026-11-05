@@ -5,6 +5,45 @@ Newest first. Each entry lists what changed, the files touched, and what to pick
 
 ---
 
+## 2026-11-05: Every state shows its winner's colour (no neutral "under 1" band)
+
+Branch: `phase-1-foundation`.
+
+### Changed
+
+- **The neutral "under 1 point" band is gone.** Owner's request: every state shows the colour
+  of whoever won it, however narrowly. Each party now has six steps: 0–1, 1–2, 2–5, 5–10,
+  10–20 and 20+ points. For example, Wisconsin 2024 (Trump +0.9) is a light Trump red, and
+  Georgia 2020 (Biden +0.2) a light Biden blue.
+- **The neutral colour is now `tie`** (`--map-tie`), used only when a place's margin is
+  exactly zero. No place in 2016–2024 is tied. It is also the midpoint of the swing slider's
+  track.
+- **Colours.** Regenerated in OKLCH and re-checked with the dataviz validator in both themes:
+  - each arm is one hue, with visible step gaps, and its faintest step is at least 2:1
+    against the canvas
+  - the two 0–1 tints, which now sit side by side, are clearly distinct: ΔE 19 / 22 for
+    normal vision and 14.5 / 17.5 for colour-blind vision (light / dark)
+- **Legend.** It shows 12 steps, Trump's widest to Harris's widest, with no grey swatch.
+- **Tests.** `marginBins.test.json` now covers the 0–1 steps, the exact tie, and the new edges.
+  53 tests.
+
+### Files
+
+- **Changed:**
+  - `apps/web/src/map/margin-bins.json`, `apps/web/src/map/marginBins.ts`,
+    `apps/web/src/map/bins.css`, `apps/web/src/map/marginBins.test.json`
+  - `apps/web/src/styles/tokens.css`, `apps/web/src/components/Legend.tsx`,
+    `apps/web/src/components/SwingSlider.module.css`
+
+### Next steps / open issues
+
+- The open issue in the entry below ("races under 1 point still show the neutral colour") is
+  resolved by this entry.
+- Pushing `phase-1-foundation` is still blocked: GitHub rejected the saved credentials on this
+  machine. The owner needs a personal access token or an SSH remote.
+
+---
+
 ## 2026-11-05: Separate colour step for 1–2 point wins
 
 Branch: `phase-1-foundation`. Committed together with the Phase 1 entry below.

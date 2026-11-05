@@ -12,7 +12,7 @@ import styles from './Legend.module.css';
 
 /** Colour key for the margin scale, labelled with the nominees' names. */
 export function Legend({ nominees }: { readonly nominees: Nominees }) {
-  const sideName = { dem: surname(nominees.dem), rep: surname(nominees.rep), tossup: 'Either' };
+  const sideName = { dem: surname(nominees.dem), rep: surname(nominees.rep) };
   return (
     <figure className={styles.legend}>
       <div className={styles.ends} aria-hidden="true">
